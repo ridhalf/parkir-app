@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('parkings', function (Blueprint $table) {
             $table->id();
             $table->unsignedTinyInteger('category_id');
+            $table->string('no_police', 20);
             $table->string('parking_code', 8);
             $table->date('date_in');
             $table->date('date_out')->nullable(true);
