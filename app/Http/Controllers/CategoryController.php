@@ -49,11 +49,12 @@ class CategoryController extends Controller
         $validasi = Validator::make(
             $request->all(),
             [
-                'name' => 'required',
+                'name' => 'required|unique:categories',
                 'charge' => 'required|numeric'
             ],
             [
                 'name.required' => 'Nama harus diisi',
+                'name.unique' => 'Nama sudah ada',
                 'charge.required' => 'Tarif harus diisi',
                 'charge.numeric' => 'Tarif harus dalam bentuk angka'
             ]
@@ -90,7 +91,7 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $validasi = Validator::make(
             $request->all(),

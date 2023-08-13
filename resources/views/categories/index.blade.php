@@ -9,7 +9,7 @@
     </nav>
 @endpush
 @push('style')
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link href="https://cdn.datatables.net/v/dt/dt-1.13.6/r-2.5.0/datatables.min.css" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -51,6 +51,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
+                        <input type="hidden" id="id_category">
                         <label for="name" class="col-sm-2 col-form-label">Name</label>
                         <div class="col-sm-10">
                             <input type="text" id="name" name="name" class="form-control">
@@ -75,7 +76,7 @@
     </div><!-- End Basic Modal-->
 @endsection
 @push('script')
-    <script src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-1.13.6/r-2.5.0/datatables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         "use strict"
@@ -139,22 +140,29 @@
             $.ajax({
                 url: "/category/" + id + "/edit",
                 type: 'GET',
+                cache: false,
                 success: function(response) {
                     $("#category-modal").modal('show');
                     $("#name").val(response.result.name)
                     $("#charge").val(response.result.charge)
-                    $("#category-save").click(function() {
-                        save(id);
-                    })
+                    $("#id_category").val(id)
                 }
             })
         })
+        $("#category-save").click(function() {
+            const id = $('#id_category').val()
+            console.log(id);
+            if (id) {
+                save(id);
+            } else {
+                save()
+            }
+            $('#category-modal').modal('toggle');
+        })
         $('body').on('click', '#category-add', function(e) {
             e.preventDefault();
+            $("#id_category").val('')
             $('#category-modal').modal('show');
-            $("#category-save").click(function() {
-                save();
-            })
         })
         $('#category-close').click(function() {
             resetForm()
@@ -162,13 +170,14 @@
         })
 
         function resetForm() {
+            $("#id_category").val('')
             $('#name').removeClass('is-invalid');
             $('#name').val('');
             $('#charge').removeClass('is-invalid');
             $('#charge').val('');
             $('#error-name').text('');
             $('#error-charge').text('');
-            $('#category-modal').modal('toggle');
+            $('#category-modal').on('hidden.bs.modal');
 
         }
 

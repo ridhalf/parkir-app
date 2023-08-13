@@ -13,4 +13,9 @@ class Parking extends Model
     protected $keyType = 'int';
     public $incrementing = true;
     public $timestamps = true;
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

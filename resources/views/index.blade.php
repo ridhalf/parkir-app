@@ -81,11 +81,14 @@
             $("#get_parking").on("click", function() {
                 window.location = "{{ url('parking') }}"
             })
+            $("#checkout").on("click", function() {
+                window.location = "{{ url('parking/checkout') }}"
+            })
         })
     </script>
     @stack('script')
     <!-- Template Main JS File -->
-    {{-- <script src="{{asset('assets/js/main.js')}}"></script> --}}
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 
 </body>
 
