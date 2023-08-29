@@ -157,7 +157,6 @@
             } else {
                 save()
             }
-            $('#category-modal').modal('toggle');
         })
         $('body').on('click', '#category-add', function(e) {
             e.preventDefault();
@@ -166,7 +165,6 @@
         })
         $('#category-close').click(function() {
             resetForm()
-            // $('#category-modal').modal('toggle');
         })
 
         function resetForm() {
@@ -177,8 +175,7 @@
             $('#charge').val('');
             $('#error-name').text('');
             $('#error-charge').text('');
-            $('#category-modal').on('hidden.bs.modal');
-
+            $('#category-modal').modal('toggle');
         }
 
         function save(id = '') {
@@ -207,6 +204,7 @@
                         $('#name').removeClass('is-invalid')
                         $('#charge').removeClass('is-invalid')
                         $('#error-name').text('')
+                        $('#error-charge').text('')
                         if (response.errors.name) {
                             $('#name').addClass('is-invalid')
                             $('#error-name').text(response.errors.name)

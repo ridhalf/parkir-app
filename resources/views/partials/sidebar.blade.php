@@ -4,7 +4,7 @@
         <li class="nav-item">
             <a class="nav-link {{ Request::is('parking') || Request::is('parking/checkout') ? '' : 'collapsed' }}"
                 data-bs-target="#parkir-menu" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-menu-button-wide"></i><span>Parkir</span><i class="bi bi-chevron-down ms-auto"></i>
+                <i class="bi bi-geo"></i><span>Parkir</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul id="parkir-menu"
                 class="nav-content collapse {{ Request::is('parking') || Request::is('parking/checkout') ? 'show' : '' }} "

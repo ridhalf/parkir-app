@@ -4,6 +4,7 @@
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="">Parkir</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('parking.index') }}">Masuk</a></li>
         </ol>
     </nav>
 @endpush
@@ -22,12 +23,26 @@
                     <h5 class="card-title">Tambah Kendaraan</h5>
                     <!-- General Form Elements -->
                     <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p>Waktu Indonesia</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <h5>
+                                <span class="badge bg-danger" id="jam"></span>
+                                <span class="badge bg-danger" id="menit"></span>
+                                <span class="badge bg-danger" id="detik"></span>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+
                         <label for="no-police" class="col-sm-4 col-form-label">No Polisi</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="no-police">
                             <small><span class="text-danger" id="error-no-police"></span></small>
                         </div>
                     </div>
+
                     <div class="row mb-3">
                         <label class="col-sm-4 col-form-label">Kategori</label>
                         <div class="col-sm-8 col-xs-8">
@@ -78,7 +93,7 @@
         $(function() {
             let table = $('#parking-table').DataTable({
                 processing: true,
-                serverSide: true,
+                serverSide: false,
                 deferRender: true,
                 responsive: true,
                 pageLength: 10,
@@ -119,7 +134,12 @@
                         data: 'check_in'
                     },
 
-                ]
+                ],
+                columnDefs: [{
+                    'sortable': false,
+                    'searchable': false,
+                    'targets': [0]
+                }],
             })
             table.on('draw.dt', function() {
                 let info = table.page.info();
@@ -134,12 +154,18 @@
 
             $(document).ready(function() {
                 $('#category').select2();
+                select_categories();
+                const timeDisplay = document.getElementById("time");
+                refreshTime(timeDisplay)
+                setInterval(refreshTime, 1000);
+            })
+            let select_categories = function() {
                 $.ajax({
                     url: "{{ route('get-all-categories') }}",
                     type: 'GET',
                     success: function(response) {
 
-                        let option = '<option selected value="">Category</option>';
+                        let option = '<option selected value="">-- Pilih kategori --</option>';
                         for (let i = 0; i < response.result.length; i++) {
                             console.log(response.result[i]);
                             option +=
@@ -148,7 +174,7 @@
                         $('#category').append(option);
                     }
                 })
-            })
+            }
             $('body').on('click', '#add-parking', function(e) {
                 e.preventDefault();
                 $.ajax({
@@ -164,6 +190,7 @@
                     success: function(response) {
                         console.log(response);
                         if (response.errors) {
+                            resetForm()
                             if (response.errors.no_police) {
                                 $('#no-police').addClass('is-invalid');
                                 $('#error-no-police').text(response.errors.no_police)
@@ -172,8 +199,16 @@
                                 $('#category').addClass('is-invalid');
                                 $('#error-category').text(response.errors.category);
                             }
+                            if (response.errors.park023) {
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: response.errors.park023,
+                                    icon: 'error',
+                                    confirmButtonText: 'Tutup'
+                                })
+                            }
                         } else {
-                            resetForm()
+                            resetForm(true)
                             $("#parking-table").DataTable().ajax.reload();
                             Swal.fire({
                                 title: 'Tersimpan!',
@@ -186,13 +221,28 @@
                 })
             })
 
-            function resetForm() {
+            function resetForm(is_success = false) {
                 $('#no-police').removeClass('is-invalid');
-                $('#no-police').val('');
                 $('#error-no-police').text('')
                 $('#category').removeClass('is-invalid');
-                $('#category').val('');
                 $('#error-category').text('');
+                if (is_success) {
+                    $('#no-police').val('')
+                    select_categories();
+                }
+            }
+
+            function refreshTime(timeDisplay) {
+                const dateString = new Date();
+                let jam = dateString.getHours();
+                let menit = dateString.getMinutes();
+                let detik = dateString.getSeconds();
+                jam = jam < 10 ? "0" + jam : jam;
+                menit = menit < 10 ? "0" + menit : menit;
+                detik = detik < 10 ? "0" + detik : detik;
+                $('#jam').text(jam)
+                $('#menit').text(menit)
+                $('#detik').text(detik)
             }
 
         })

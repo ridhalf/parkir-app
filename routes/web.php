@@ -42,5 +42,6 @@ Auth::routes([
 ]);
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $title = 'Dashboard';
+    return view('dashboard', compact('title'));
 })->name('home');

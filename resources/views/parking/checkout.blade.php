@@ -4,6 +4,7 @@
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="">Parkir</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('parking.checkout') }}">Keluar</a></li>
         </ol>
     </nav>
 @endpush
@@ -23,7 +24,7 @@
                         <label for="parking_code" class="col-sm-4 col-form-label">Kode</label>
                         <div class="col-sm-8">
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="basic-addon3">PKR</span>
+                                <span class="input-group-text" id="basic-addon3">PKR-</span>
                                 <input type="text" class="form-control" id="parking_code"
                                     aria-describedby="basic-addon3">
                             </div>
@@ -194,6 +195,8 @@
                             $('#error-parking-code').text(response.errors.parking_code)
                         } else {
                             $("#parking-table").DataTable().ajax.reload();
+                            $("#parking_code").val('');
+                            $("#error-parking-code").text('');
                             Swal.fire({
                                 title: 'Tersimpan!',
                                 text: response.success,

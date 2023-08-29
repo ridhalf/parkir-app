@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Parking;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Database\QueryException;
 
 class ParkingController extends Controller
 {
@@ -38,22 +41,28 @@ class ParkingController extends Controller
         }
         $count_parking = Parking::count();
 
+
         $parking = new Parking();
-        $parking->no_police = trim($request->no_police);
+        $parking->no_police = Str::upper(trim($request->no_police));
         $parking->category_id = $request->category;
         $parking->parking_code = 'PKR-' . sprintf('%04d', $count_parking + 1);
         $parking->date_in = date('Y-m-d');
         $parking->check_in = date('H:i:s');
         $parking->status = 'IN';
-        $parking->save();
+        try {
+            $parking->save();
+        } catch (QueryException $e) {
+            return response()->json(['errors' => ['park023' => 'data gagal disimpan']]);
+        }
         return response()->json(['success', 'Parkir disimpan']);
     }
     public function datatable(Request $request)
     {
         $parking = Parking::select('parkings.*', 'categories.name as name')
             ->join('categories', 'categories.id', '=', 'parkings.category_id')
-            ->where('date_in', date('Y-m-d'))
+            // ->where('date_in', date('Y-m-d'))
             ->where('status', $request->status)
+            ->orderBy('created_at', 'DESC')
             ->get();
         return DataTables::of($parking)
             ->addColumn('no', '')
@@ -73,7 +82,7 @@ class ParkingController extends Controller
         if ($validasi->fails()) {
             return response()->json(['errors' => $validasi->errors()]);
         }
-        $parking = Parking::where('parking_code', 'PKR-' . $request->parking_code)->where('status', 'IN')->first();
+        $parking = Parking::where('parking_code', 'PKR-' . trim($request->parking_code))->where('status', 'IN')->first();
 
         if ($parking == null) {
             return response()->json(['errors' => ['parking_code' => 'Kode parkir salah atau tidak ditemukan']]);
